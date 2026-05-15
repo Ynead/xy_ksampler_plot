@@ -1,9 +1,6 @@
 # XY KSampler Plot
 
 A custom ComfyUI node that generates a **full XY grid** of images by independently varying two parameters — LoRA selection, seed, LoRA weight, CFG, or steps.
-
-Built specifically for SDXL-based models (Cosmo 2 / Anima).
-
 ---
 
 ## Installation
@@ -66,22 +63,6 @@ For LoRA axes, use the **📂 Pick X/Y LoRAs** buttons that appear on the node �
 |--------|-------|-------------|
 | grid_image | [1, H, W, 3] | assembled grid with optional labels |
 | all_images | [N, H, W, 3] | every cell as a batch |
-
----
-
-## Key design decisions
-
-### No tensor mismatch
-All images come from the same latent shape and VAE. Grid assembly uses `torch.cat` along explicit dimensions with shape-checked padding. Any cell that throws an error renders a red placeholder instead of crashing the whole run.
-
-### LoRA isolation
-Each cell loads the LoRA **fresh from the original model weights** — no patch accumulation between cells. This avoids the compounding-strength bug seen in loop-based approaches.
-
-### `fix_empty_latent_channels`
-Called before sampling when available (SDXL / Cosmo 2 needs this to match the 4-channel latent shape). Handled with a graceful fallback for older ComfyUI builds.
-
-### Memory
-`comfy.model_management.soft_empty_cache()` is called after each cell to keep VRAM usage bounded across large grids.
 
 ---
 
